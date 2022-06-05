@@ -1,7 +1,7 @@
 ASSET_DIR = "BuiltPinningAssets"
 
 # Set a fallback if SDKROOT or RC_PLATFORM_NAME are not defined
-SDKROOT ?= $(shell xcrun --sdk iphoneos.internal --show-sdk-path)
+SDKROOT ?= $(shell xcrun --sdk iphoneos --show-sdk-path)
 RC_PLATFORM_NAME ?= iPhoneOS
 
 # Use xcrun (which knows about SDKROOT) to find the correct tools

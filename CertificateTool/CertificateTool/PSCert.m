@@ -8,9 +8,10 @@
 #import "PSCert.h"
 #import "PSUtilities.h"
 #import "PSAssetConstants.h"
-#import <corecrypto/ccsha1.h>
-#import <corecrypto/ccsha2.h>
-#import <corecrypto/ccdigest.h>
+//#import <corecrypto/ccsha1.h>
+//#import <corecrypto/ccsha2.h>
+//#import <corecrypto/ccdigest.h>
+#include <CommonCrypto/CommonDigest.h>
 #import <Security/Security.h>
 
 #import "DataConversion.h"
@@ -184,13 +185,14 @@ static CFDataRef GetSubjectKeyID(SecCertificateRef cert)
         return result;
     }
 
-    unsigned char subject_digest[CCSHA1_OUTPUT_SIZE];
-    memset(subject_digest, 0, CCSHA1_OUTPUT_SIZE);
-    const struct ccdigest_info* digest_info = ccsha1_di();
+    unsigned char subject_digest[CC_SHA1_DIGEST_LENGTH];
+    memset(subject_digest, 0, CC_SHA1_DIGEST_LENGTH);
+//    const struct ccdigest_info* digest_info = ccsha1_di();
 
-    ccdigest(digest_info, (unsigned long)[normalized_subject length], [normalized_subject bytes], subject_digest);
-
-    result = [NSData dataWithBytes:subject_digest length:CCSHA1_OUTPUT_SIZE];
+//    ccdigest(digest_info, (unsigned long)[normalized_subject length], [normalized_subject bytes], subject_digest);
+    CC_SHA1([normalized_subject bytes], (CC_LONG)[normalized_subject length], subject_digest);
+    
+    result = [NSData dataWithBytes:subject_digest length:CC_SHA1_DIGEST_LENGTH];
 
     return result;
 }
@@ -198,25 +200,26 @@ static CFDataRef GetSubjectKeyID(SecCertificateRef cert)
 - (NSData *)getCertificateHash
 {
     NSData* result = nil;
-    unsigned char certificate_digest[CCSHA1_OUTPUT_SIZE];
-    const struct ccdigest_info* digest_info = ccsha1_di();
+    unsigned char certificate_digest[CC_SHA1_DIGEST_LENGTH];
+//    const struct ccdigest_info* digest_info = ccsha1_di();
 
-    ccdigest(digest_info, (unsigned long)[_cert_data length], [_cert_data bytes], certificate_digest);
-    //(void)CC_SHA1([_cert_data bytes], (CC_LONG)[_cert_data length], certificate_digest);
+//    ccdigest(digest_info, (unsigned long)[_cert_data length], [_cert_data bytes], certificate_digest);
+    (void)CC_SHA1([_cert_data bytes], (CC_LONG)[_cert_data length], certificate_digest);
 
-    result = [NSData dataWithBytes:certificate_digest length:CCSHA1_OUTPUT_SIZE];
+    result = [NSData dataWithBytes:certificate_digest length:CC_SHA1_DIGEST_LENGTH];
     return result;
 }
 
 - (NSData *)getCertificateSHA256Hash
 {
     NSData* result = nil;
-    unsigned char certificate_digest[CCSHA256_OUTPUT_SIZE];
-    const struct ccdigest_info* digest_info = ccsha256_di();
+    unsigned char certificate_digest[CC_SHA256_DIGEST_LENGTH];
+//    const struct ccdigest_info* digest_info = ccsha256_di();
 
-    ccdigest(digest_info, (unsigned long)[_cert_data length], [_cert_data bytes], certificate_digest);
+//    ccdigest(digest_info, (unsigned long)[_cert_data length], [_cert_data bytes], certificate_digest);
+    CC_SHA256([_cert_data bytes], (CC_LONG)[_cert_data length], certificate_digest);
 
-    result = [NSData dataWithBytes:certificate_digest length:CCSHA256_OUTPUT_SIZE];
+    result = [NSData dataWithBytes:certificate_digest length:CC_SHA256_DIGEST_LENGTH];
     return result;
 }
 
@@ -283,6 +286,7 @@ extern CFDataRef SecCertificateCopyPublicKeySHA1DigestFromCertificateData(CFAllo
 
         key_data = [NSData dataWithBytes:CFDataGetBytePtr(temp_data) length:CFDataGetLength(temp_data)];
 #if DEBUG
+        if (key_data) {
             NSString *str = [[key_data toHexString] uppercaseString];
             CFStringRef name = SecCertificateCopySubjectSummary(cert_ref);
             NSLog(@"AuthKeyID for %@ is %@", name, str);

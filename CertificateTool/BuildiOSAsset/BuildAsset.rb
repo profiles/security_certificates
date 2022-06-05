@@ -71,11 +71,11 @@ class BuildPKIAsset
             exit
         end
 
-        asset_tool_path = `xcodebuild -sdk iphoneos.internal -find assettool`
-        if asset_tool_path.nil?
-            puts "Unable to find the mobile asset tool in the iPhone SDK"
-            exit
-        end
+        # asset_tool_path = `xcodebuild -sdk iphoneos -find assettool`
+        # if asset_tool_path.nil?
+        #     puts "Unable to find the mobile asset tool in the iPhone SDK"
+        #     exit
+        # end
         
         
         @output_directory = File.expand_path(output_directory)
@@ -138,33 +138,34 @@ class BuildPKIAsset
         end
         
         output_str "Completed copying over the plist files"
+        output_str "asset_directory = #{asset_directory}"
         
-        output_str "About to call assettool stage" 
-        `xcrun -sdk iphoneos.internal assettool stage -p #{@asset_directory} -s #{@staging_directory}`
-        output_str "Completed call to assettool stage" 
-        output_str(nil, true)
-        output_str( " ")
-        
-        output_str(nil, true)
-        output_str "Done with BuildPKIAsset.stage"
-        output_str(nil, true)
-        output_str( " ")    
+#        output_str "About to call assettool stage"
+#        `xcrun -sdk iphoneos assettool stage -p #{@asset_directory} -s #{@staging_directory}`
+#        output_str "Completed call to assettool stage"
+#        output_str(nil, true)
+#        output_str( " ")
+#
+#        output_str(nil, true)
+#        output_str "Done with BuildPKIAsset.stage"
+#        output_str(nil, true)
+#        output_str( " ")
     end
     
     def sign
-        output_str(nil, true)
-        output_str "In BuildPKIAsset.sign" 
-        output_str "About to call assettool sign" 
-        `xcrun -sdk iphoneos.internal assettool sign -s #{@staging_directory}`
-        output_str "Completed call to assettool sign"
-        output_str "Done with BuildPKIAsset.sign"
-        output_str(nil, true)
-        output_str( " ")                       
+#        output_str(nil, true)
+#        output_str "In BuildPKIAsset.sign" 
+#        output_str "About to call assettool sign" 
+#        `xcrun -sdk iphoneos assettool sign -s #{@staging_directory}`
+#        output_str "Completed call to assettool sign"
+#        output_str "Done with BuildPKIAsset.sign"
+#        output_str(nil, true)
+#        output_str( " ")                       
     end
     
 end
 
-@verbose = false
+@verbose = true
 
 def do_output_str(str, header = false)
     return if !@verbose

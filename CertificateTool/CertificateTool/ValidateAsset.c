@@ -9,9 +9,9 @@
 #include <Security/Security.h>
 
 #include <CommonCrypto/CommonDigest.h>
-#include <CommonCrypto/CommonDigestSPI.h>
-#include <CommonCrypto/CommonRSACryptor.h>
-#include <CommonNumerics/CommonBaseXX.h>
+//#include <CommonCrypto/CommonDigestSPI.h>
+//#include <CommonCrypto/CommonRSACryptor.h>
+//#include <CommonNumerics/CommonBaseXX.h>
 #include <stdio.h>
 #include <sys/types.h>
 #include <dirent.h>
@@ -97,7 +97,6 @@ static int ReadFileIntoCFDataRef(const char* file_path, CFDataRef* out_data)
 static int CreateHashForData(CFDataRef cfData, int useSHA1, CFDataRef* out_hash)
 {
 	int result = -1; // Guilty until proven
-	CCDigestAlgorithm algo = (useSHA1) ? kCCDigestSHA1 :kCCDigestSHA256;
 	size_t digest_length = (useSHA1) ? CC_SHA1_DIGEST_LENGTH : CC_SHA256_DIGEST_LENGTH;
 	UInt8 buffer[digest_length];
     
@@ -110,7 +109,7 @@ static int CreateHashForData(CFDataRef cfData, int useSHA1, CFDataRef* out_hash)
 	
 	memset(buffer, 0, digest_length);
 	
-	if (!CCDigest(algo, CFDataGetBytePtr(cfData), CFDataGetLength(cfData), buffer))
+    if (!(useSHA1 ? CC_SHA1(CFDataGetBytePtr(cfData), (CC_LONG)CFDataGetLength(cfData), buffer) : CC_SHA256(CFDataGetBytePtr(cfData), (CC_LONG)CFDataGetLength(cfData), buffer)))
 	{
 		*out_hash = CFDataCreate(kCFAllocatorDefault, (const UInt8 *)buffer, digest_length);
 	}

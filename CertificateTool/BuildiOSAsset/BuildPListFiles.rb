@@ -7,7 +7,7 @@
 
 require 'fileutils'
 
-@verbose = false
+@verbose = true
 
 def do_output_str(str, header = false)
     return if !@verbose
